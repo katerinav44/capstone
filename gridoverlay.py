@@ -66,6 +66,7 @@ ax.grid(color='white', linewidth=1)
 # Show the image
 ax.axis('on')  
 plt.show()
+fig.savefig("map1_grid_components.jpg")
 
 #save the list to a txt file
 with open('panel_coordinates.txt', 'w') as f:
