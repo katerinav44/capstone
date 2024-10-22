@@ -1,12 +1,15 @@
 import numpy as np
 
-def run_factory(fact, bays, vehicles):
+def run_factory(fact, bays, vehicles, sort):
     t = 0
     buffer = []
     installed = []
     t_return = np.zeros(vehicles)
     t_built = []
     avail_cars = []
+    
+    if sort == True:
+        bays = sort_by_dist(bays, fact)
     planned = list(bays)
 
     while installed != bays:
@@ -29,13 +32,13 @@ def run_factory(fact, bays, vehicles):
                 installed.append(deliver_bay)
                 car = avail_cars.pop(0)
                 t_return[car] = deliver(fact, deliver_bay, t)
-        print("t = %i" %t)
-        print("Planned: {}".format(planned))
-        print("Built: {}".format(t_built))
-        print("Buffer: {}".format(buffer))
-        print("Installed: {}".format(installed))
-        print("Available Cars: {}".format(avail_cars))
-        print("Return Cars: {}".format(t_return))
+        # print("t = %i" %t)
+        # print("Planned: {}".format(planned))
+        # print("Built: {}".format(t_built))
+        # print("Buffer: {}".format(buffer))
+        # print("Installed: {}".format(installed))
+        # print("Available Cars: {}".format(avail_cars))
+        # print("Return Cars: {}".format(t_return))
 
         t += 1
     t_finish = np.max(t_return)
@@ -61,27 +64,59 @@ def dist(fact, bay):
     y_dist = np.abs(fact[1] - bay[1])
     return x_dist + y_dist
 
-vehicles = 2
-bays = [(1,1), (1,2), (1,3)]
+def convert_text_coordinates(file_name):
+    my_file = open(file_name, "r")
+    data = my_file.read()
+    str_list = data.split("\n") 
+    my_file.close() 
+    coordinates = []
+
+    for entry in str_list:
+        if len(entry) > 0:
+            entry = entry.replace("'",'')
+            entry = entry.replace("(",'')
+            entry = entry.replace(")",'')
+            entry = entry.replace(" ",'')
+            entry = entry.split(",")
+            x_coord = float(entry[0])
+            y_coord = float(entry[1])
+            coordinates.append(tuple([x_coord, y_coord]))
+    return coordinates
+
+def sort_by_dist(coordinates, fact):
+    coordinates.sort(key = lambda p: np.abs(p[0] - fact[0]) + np.abs(p[1] - fact[1]))
+    return coordinates
+# testing reducing build time with different more vehicles
+def test_vehicles(max_vehicles, fact, bays, sort):
+    for i in range(1,max_vehicles):
+        print("Vehicles: %i" %i)
+        run_factory(fact, bays, i, sort)
+
+# testing reducing build time with different factory locations
+def test_factories(vehicles, facts, bays, sort):
+    for fact in facts:
+        print("Factory: {}".format(fact))
+        run_factory(fact, bays, vehicles, sort)
+
+# testing reducing build time by sorting bays by distance
+def test_sort(vehicles, fact, bays):
+    sort = False
+    print("Sort = {}".format(sort))
+    run_factory(fact, bays, vehicles, sort)
+
+    sort = True
+    print("Sort = {}".format(sort))
+    run_factory(fact, bays, vehicles, sort)
+
+max_vehicles = 5
 fact = (0,0)
-#run_factory(fact, bays, vehicles)
+bays = convert_text_coordinates("panel_coordinates.txt")
+sort = False
+#test_vehicles(max_vehicles, fact, bays, sort)
 
-my_file = open("panel_coordinates.txt", "r")
-data = my_file.read()
-str_list = data.split("\n") 
+vehicles = 3
+facts = [(900,6600),(3600,0),(8100,0),(8100,3600)]
+test_factories(vehicles, facts, bays, sort)
 
-my_file.close() 
-
-coordinates = []
-entry = str_list[1]
-entry = entry.replace("'",'')
-entry = entry.replace("(",'')
-entry = entry.replace(")",'')
-entry = entry.replace(" ",'')
-entry = entry.split(",")
-print(entry)
-#for entry in str_list:
-# x_coord = float(entry[2:9])
-# y_coord = float(entry[-5:-2])
-# coordinates.append(tuple([x_coord, y_coord]))
-# print(coordinates)
+fact = facts[0]
+test_sort(vehicles, fact, bays)
