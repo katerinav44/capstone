@@ -11,6 +11,7 @@ def run_factory(fact, bays, vehicles):
 
     while installed != bays:
         for i in range(vehicles):
+            # car has returned from delivery + install
             if t == t_return[i]:
                 avail_cars.append(i)
         
@@ -37,16 +38,18 @@ def run_factory(fact, bays, vehicles):
         print("Return Cars: {}".format(t_return))
 
         t += 1
-    print("Finish Building at t = %i" %np.max(t_return))
+    t_finish = np.max(t_return)
+    print("Finish Building at t = %i" %t_finish)
+    return t_finish
 
 def build(bay, t):
-    T_bay = 5
+    T_bay = 5 # 4-5 min to assembly
     t_built = t + T_bay
     return t_built
 
 def deliver(fact, bay, t):
-    v = 0.4
-    T_install = 6
+    v = 400 # 24 km/h = 400 m/min
+    T_install = 6 # 6 min to install
 
     distance = dist(fact, bay)
     travel = 2 * np.ceil(distance / v)
@@ -61,4 +64,24 @@ def dist(fact, bay):
 vehicles = 2
 bays = [(1,1), (1,2), (1,3)]
 fact = (0,0)
-run_factory(fact, bays, vehicles)
+#run_factory(fact, bays, vehicles)
+
+my_file = open("panel_coordinates.txt", "r")
+data = my_file.read()
+str_list = data.split("\n") 
+
+my_file.close() 
+
+coordinates = []
+entry = str_list[1]
+entry = entry.replace("'",'')
+entry = entry.replace("(",'')
+entry = entry.replace(")",'')
+entry = entry.replace(" ",'')
+entry = entry.split(",")
+print(entry)
+#for entry in str_list:
+# x_coord = float(entry[2:9])
+# y_coord = float(entry[-5:-2])
+# coordinates.append(tuple([x_coord, y_coord]))
+# print(coordinates)
