@@ -1,6 +1,6 @@
 import numpy as np
 
-def run_factory(fact, bays, vehicles, sort):
+def run_factory(fact, bays, vehicles):
     t = 0
     buffer = []
     installed = []
@@ -8,8 +8,6 @@ def run_factory(fact, bays, vehicles, sort):
     t_built = []
     avail_cars = []
     
-    if sort == True:
-        bays = sort_by_dist(bays, fact)
     planned = list(bays)
 
     while installed != bays:
@@ -87,16 +85,16 @@ def sort_by_dist(coordinates, fact):
     coordinates.sort(key = lambda p: np.abs(p[0] - fact[0]) + np.abs(p[1] - fact[1]))
     return coordinates
 # testing reducing build time with different more vehicles
-def test_vehicles(max_vehicles, fact, bays, sort):
+def test_vehicles(max_vehicles, fact, bays):
     for i in range(1,max_vehicles):
         print("Vehicles: %i" %i)
-        run_factory(fact, bays, i, sort)
+        run_factory(fact, bays, i)
 
 # testing reducing build time with different factory locations
-def test_factories(vehicles, facts, bays, sort):
+def test_factories(vehicles, facts, bays):
     for fact in facts:
         print("Factory: {}".format(fact))
-        run_factory(fact, bays, vehicles, sort)
+        run_factory(fact, bays, vehicles)
 
 # testing reducing build time by sorting bays by distance
 def test_sort(vehicles, fact, bays):
@@ -105,8 +103,9 @@ def test_sort(vehicles, fact, bays):
     run_factory(fact, bays, vehicles, sort)
 
     sort = True
+    bays = sort_by_dist(bays, fact)
     print("Sort = {}".format(sort))
-    run_factory(fact, bays, vehicles, sort)
+    run_factory(fact, bays, vehicles)
 
 max_vehicles = 5
 fact = (0,0)
@@ -116,7 +115,7 @@ sort = False
 
 vehicles = 3
 facts = [(900,6600),(3600,0),(8100,0),(8100,3600)]
-test_factories(vehicles, facts, bays, sort)
+test_factories(vehicles, facts, bays)
 
-fact = facts[0]
-test_sort(vehicles, fact, bays)
+#fact = facts[0]
+#test_sort(vehicles, fact, bays)
