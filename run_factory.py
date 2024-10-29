@@ -120,5 +120,5 @@ vehicles = 3
 facts = [(900,6600),(3600,0),(8100,0),(8100,3600)]
 #test_factories(vehicles, facts, bays)
 
-#fact = facts[0]
+fact = facts[0]
 #test_sort(vehicles, fact, bays)
