@@ -1,4 +1,6 @@
 import numpy as np
+import scipy as sp
+import scipy.spatial.distance as spd
 
 def run_factory(fact, bays, vehicles):
     t = 0
@@ -8,6 +10,7 @@ def run_factory(fact, bays, vehicles):
     t_built = []
     avail_cars = []
     
+    #print(fact)
     planned = list(bays)
 
     while installed != bays:
@@ -40,7 +43,7 @@ def run_factory(fact, bays, vehicles):
 
         t += 1
     t_finish = np.max(t_return)
-    print("Finish Building at t = %i" %t_finish)
+    #print("Finish Building at t = %i" %t_finish)
     return t_finish
 
 def build(bay, t):
@@ -115,7 +118,7 @@ sort = False
 
 vehicles = 3
 facts = [(900,6600),(3600,0),(8100,0),(8100,3600)]
-test_factories(vehicles, facts, bays)
+#test_factories(vehicles, facts, bays)
 
 #fact = facts[0]
 #test_sort(vehicles, fact, bays)
