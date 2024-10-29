@@ -2,7 +2,7 @@ import numpy as np
 import scipy as sp
 import scipy.spatial.distance as spd
 
-def run_factory(fact, bays, vehicles):
+def run_factory(fact, bays, vehicles, sort):
     t = 0
     buffer = []
     installed = []
@@ -10,6 +10,8 @@ def run_factory(fact, bays, vehicles):
     t_built = []
     avail_cars = []
     
+    if sort == True:
+        bays = sort_by_dist(bays, fact)
     #print(fact)
     planned = list(bays)
 
@@ -91,24 +93,23 @@ def sort_by_dist(coordinates, fact):
 def test_vehicles(max_vehicles, fact, bays):
     for i in range(1,max_vehicles):
         print("Vehicles: %i" %i)
-        run_factory(fact, bays, i)
+        sort = True
+        run_factory(fact, bays, i, sort)
 
 # testing reducing build time with different factory locations
 def test_factories(vehicles, facts, bays):
     for fact in facts:
         print("Factory: {}".format(fact))
-        run_factory(fact, bays, vehicles)
+        sort = True
+        run_factory(fact, bays, vehicles, sort)
 
 # testing reducing build time by sorting bays by distance
 def test_sort(vehicles, fact, bays):
     sort = False
-    print("Sort = {}".format(sort))
     run_factory(fact, bays, vehicles, sort)
 
     sort = True
-    bays = sort_by_dist(bays, fact)
-    print("Sort = {}".format(sort))
-    run_factory(fact, bays, vehicles)
+    run_factory(fact, bays, vehicles, sort)
 
 max_vehicles = 5
 fact = (0,0)
