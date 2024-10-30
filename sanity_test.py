@@ -53,7 +53,6 @@ bays = [(500, 100), (600, 100), (500, 200), (600, 200), (500, 300), (600, 300)]
 factories = [(0, 0), (200, 200), (100, 400)]
 vehicles = 2
 sort = True
-
 # Run test to determine the best factory location
 print("\nTesting Out Case 5:")
 test_factories(vehicles, factories, bays, sort)

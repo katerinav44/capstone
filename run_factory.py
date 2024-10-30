@@ -97,11 +97,13 @@ def test_vehicles(max_vehicles, fact, bays):
         run_factory(fact, bays, i, sort)
 
 # testing reducing build time with different factory locations
-def test_factories(vehicles, facts, bays):
+def test_factories(vehicles, facts, bays, sort):
+    t_finish=[]
     for fact in facts:
-        print("Factory: {}".format(fact))
+        #print("Factory: {}".format(fact))
         sort = True
-        run_factory(fact, bays, vehicles, sort)
+        t_finish.append(run_factory(fact, bays, vehicles, sort))
+    return t_finish
 
 # testing reducing build time by sorting bays by distance
 def test_sort(vehicles, fact, bays):
