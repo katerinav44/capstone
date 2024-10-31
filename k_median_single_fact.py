@@ -44,7 +44,7 @@ def k_median_single_factory(bays, facts, n_vehicles, k):
     n_facts = len(facts) # we should also account for the fact that there may be less factories than available factory locations
     problem = pl.LpProblem("k_median", pl.LpMinimize)
 
-    # Coordinates of a factory (continuous variable)
+    # X and Y decision variables
     X = pl.LpVariable.dicts("bay_factory", indices = (range(len(bays)), range(len(facts))), lowBound=0, upBound=1, cat='Binary')
     Y = pl.LpVariable.dicts("factory_chosen", indices = range(len(facts)), lowBound=0, upBound=1, cat='Binary')
 

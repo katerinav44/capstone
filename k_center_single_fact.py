@@ -35,28 +35,30 @@ for i in range(len(bays)):
 
 # === Decision Variables ===
 
-def k_median_single_factory(bays, facts, n_vehicles, k):
+def k_center_single_factory(bays, facts, n_vehicles, k):
     bays_list=bays
     facts_list=facts
     bays = np.array(bays_list)
     facts = np.array(facts_list) #the most annoying way of doing this I know
     n_bays = len(bays)
     n_facts = len(facts) # we should also account for the fact that there may be less factories than available factory locations
-    problem = pl.LpProblem("k_median", pl.LpMinimize)
+    problem = pl.LpProblem("k_center", pl.LpMinimize)
 
-    # Coordinates of a factory (continuous variable)
+    # X and Y decision variables
     X = pl.LpVariable.dicts("bay_factory", indices = (range(len(bays)), range(len(facts))), lowBound=0, upBound=1, cat='Binary')
     Y = pl.LpVariable.dicts("factory_chosen", indices = range(len(facts)), lowBound=0, upBound=1, cat='Binary')
-
+    z = pl.LpVariable("max_bay_fact_dist")
     # === Objective Function ===
-    # Minimize k-median distance as a heuristic for time
+    # Minimize k-center distance as a heuristic for time
     problem += (
-        sum(sum(spd.cityblock(bays[i], facts[j]) * X[i][j] for j in range(n_facts)) for i in range(n_bays))
-    ), "k_median"
+        z
+    ), "k_center"
 
     # === Constraints ===
     for i in range(n_bays):
         problem += sum(X[i][j] for j in range(n_facts)) == 1 # each bay i serviced by 1 factory
+        problem += sum(spd.cityblock(bays[i], facts[j]) * X[i][j] for j in range(n_facts)) <= z 
+        # maximum distance between a bay and factory is minimized
 
     problem += sum(Y[j] for j in range(n_facts)) == k # k = 1 factories chosen total - expand to k = 1
 
@@ -79,4 +81,4 @@ def k_median_single_factory(bays, facts, n_vehicles, k):
     return optimal_facts
 
 
-#k_median_single_factory(bays_test1, facts, 2, 3)
+k_center_single_factory(bays_test1, facts, 2, 3)
