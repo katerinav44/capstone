@@ -35,7 +35,7 @@ for i in range(len(bays)):
 
 # === Decision Variables ===
 
-def k_median_single_factory(bays, facts, n_vehicles):
+def k_median_single_factory(bays, facts, n_vehicles, k):
     bays_list=bays
     facts_list=facts
     bays = np.array(bays_list)
@@ -55,7 +55,6 @@ def k_median_single_factory(bays, facts, n_vehicles):
     ), "k_median"
 
     # === Constraints ===
-    k = 1
     for i in range(n_bays):
         problem += sum(X[i][j] for j in range(n_facts)) == 1 # each bay i serviced by 1 factory
 
@@ -80,4 +79,4 @@ def k_median_single_factory(bays, facts, n_vehicles):
     return optimal_facts
 
 
-#k_median_single_factory(bays_test1, facts, 2)
+#k_median_single_factory(bays_test1, facts, 2, 3)
