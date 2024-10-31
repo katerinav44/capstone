@@ -18,7 +18,7 @@ def calculate_time(factory_locations, bays):
     for factory, assigned_bays in factory_assignments.items():
         constr_times.append(run_factory(factory, assigned_bays, 3, True))
     #Since the factories are building at the same time, the time it would take to build the whole site corresponds to the maximum time among each construction group
-    return max(constr_times)
+    return max(constr_times), factory_assignments
 
 def heuristic_solution(bays, factory_locations, n_factories):
     best_time = float('inf')
@@ -26,15 +26,17 @@ def heuristic_solution(bays, factory_locations, n_factories):
 
     # Generate all combinations of two factory locations
     for factory_group in itertools.combinations(factory_locations, n_factories):
-        time = calculate_time(factory_group, bays)
+        time, assignments = calculate_time(factory_group, bays)
         if time < best_time:
             best_time = time
             best_assignment = factory_group
+            best_assignments_dict=assignments
 
     print("Best Factory Locations:", best_assignment)
     print("Total Time Required:", best_time)
+    #print("Assignments", best_assignments_dict)
 
-    return best_assignment, best_time
+    return best_assignment, best_time, best_assignments_dict
 
 
 
