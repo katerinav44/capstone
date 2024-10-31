@@ -38,18 +38,14 @@ for i in range(len(bays)):
 
 n_vehicles=10
 n_factories=3
-<<<<<<< Updated upstream
 min_fact_test3, time_test3, assignments_test3=heuristic_solution(bays_test1, facts, n_factories)
-=======
 
 min_fact_test2=k_median_single_factory(bays_test1, facts, n_vehicles, n_factories)
 #min_fact_test3, time_test3=heuristic_solution(bays_test1, facts, n_factories)
->>>>>>> Stashed changes
 
 #plot bays and factories 
 plt.figure(figsize=(10,15))
 plt.scatter(*zip(*bays), marker='.', color='k', label='bays')
-<<<<<<< Updated upstream
 plt.scatter(*zip(*facts), marker='x', color='k', label='factories')
 #plt.scatter(*zip(*min_fact_test2), marker='o', s=70,color='green', label='optimal factory location k-median')
 #plt.scatter(*zip(*min_fact_test1), marker='x', s=50,color='purple', label='optimal factory location objective func')
@@ -58,12 +54,10 @@ for factory, assigned_bays in assignments_test3.items():
     color=np.random.choice(range(256), size=3)/256
     plt.scatter(factory[0], factory[1], marker='o',s=70, color=color)
     plt.scatter(*zip(*assigned_bays), marker='.', color=color, label='bays assigned to factory '+str(factory))
-=======
 plt.scatter(*zip(*facts), marker='x', color='red', label='factories')
 plt.scatter(*zip(*min_fact_test2), marker='o', s=70,color='green', label='optimal factory location k-median')
 #plt.scatter(*zip(*min_fact_test1), marker='x', s=50,color='purple', label='optimal factory location objective func')
 #plt.scatter(*zip(*min_fact_test3), marker='o', s=70, color='magenta', label='Optimal factory locations heuristic method 3 factories')
->>>>>>> Stashed changes
 plt.plot(*zip(*bbox), color='blue', label='bounding box for test')
 plt.xlabel('x')
 plt.ylabel('y')
