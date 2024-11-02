@@ -23,9 +23,15 @@ def run_factory(fact, bays, vehicles, sort):
         
         # building a new bay
         if len(buffer) < 2 and len(planned) > 0:
-            build_bay = planned.pop(0)
-            t_built.append(build(build_bay, t))
-            buffer.append(build_bay)
+            if len(buffer) == 1:
+                if t >= t_built[0]:
+                    build_bay = planned.pop(0)
+                    t_built.append(build(build_bay, t))
+                    buffer.append(build_bay)
+            else:
+                build_bay = planned.pop(0)
+                t_built.append(build(build_bay, t))
+                buffer.append(build_bay)
         
         # delivering and installing a built bay
         if len(avail_cars) > 0 and len(buffer) > 0:
