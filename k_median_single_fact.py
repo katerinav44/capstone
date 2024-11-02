@@ -67,14 +67,14 @@ def k_median_single_factory(bays, facts, n_vehicles, k):
     problem.solve()
 
     # === Output the results ===
-    print(f"Status: {pl.LpStatus[problem.status]}")
+    #print(f"Status: {pl.LpStatus[problem.status]}")
     optimal_facts=[]
     for j in range(n_facts):
         fact_time = run_factory(facts_list[j], bays_list, n_vehicles, True)
         fact_dist = sum(spd.cityblock(bays[i], facts[j]) for i in range(n_bays))
-        print(f"Factory: {facts[j]}, Time: {fact_time}, Total Distance: {fact_dist}")
+        #print(f"Factory: {facts[j]}, Time: {fact_time}, Total Distance: {fact_dist}")
         if Y[j].varValue == 1:
-            print(f"Factory Chosen: {facts[j]}")
+            #print(f"Factory Chosen: {facts[j]}")
             optimal_facts.append(facts[j])
     return optimal_facts
 

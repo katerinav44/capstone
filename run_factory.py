@@ -35,17 +35,17 @@ def run_factory(fact, bays, vehicles, sort):
                 installed.append(deliver_bay)
                 car = avail_cars.pop(0)
                 t_return[car] = deliver(fact, deliver_bay, t)
-        # print("t = %i" %t)
-        # print("Planned: {}".format(planned))
-        # print("Built: {}".format(t_built))
-        # print("Buffer: {}".format(buffer))
-        # print("Installed: {}".format(installed))
-        # print("Available Cars: {}".format(avail_cars))
-        # print("Return Cars: {}".format(t_return))
+        print("t = %i" %t)
+        print("Planned: {}".format(planned))
+        print("Built: {}".format(t_built))
+        print("Buffer: {}".format(buffer))
+        print("Installed: {}".format(installed))
+        print("Available Cars: {}".format(avail_cars))
+        print("Return Cars: {}".format(t_return))
 
         t += 1
     t_finish = np.max(t_return)
-    #print("Finish Building at t = %i" %t_finish)
+    print("Finish Building at t = %i" %t_finish)
     return t_finish
 
 def build(bay, t):
@@ -59,6 +59,7 @@ def deliver(fact, bay, t):
 
     distance = dist(fact, bay)
     travel = 2 * np.ceil(distance / v)
+    print(travel)
     t_return = t + travel + T_install
     return t_return
 
@@ -89,6 +90,7 @@ def convert_text_coordinates(file_name):
 def sort_by_dist(coordinates, fact):
     coordinates.sort(key = lambda p: np.abs(p[0] - fact[0]) + np.abs(p[1] - fact[1]))
     return coordinates
+
 # testing reducing build time with different more vehicles
 def test_vehicles(max_vehicles, fact, bays):
     for i in range(1,max_vehicles):
@@ -125,3 +127,7 @@ facts = [(900,6600),(3600,0),(8100,0),(8100,3600)]
 
 fact = facts[0]
 #test_sort(vehicles, fact, bays)
+
+fact = (0,0)
+bays = [(100,100), (150,150)]
+run_factory(fact, bays, 2, True)
