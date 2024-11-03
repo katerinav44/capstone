@@ -31,15 +31,15 @@ for i in range(len(bays)):
     if x>=xmin and x<=xmax and y>=ymin and y<=ymax:
         bays_test1.append((x,y))
 
-n_vehicles=1
-n_factories=3
+n_vehicles=10
+n_factories=1
 
-#t_finish_test1=test_factories(n_vehicles, facts, bays_test1, True)
+t_finish_test1=test_factories(n_vehicles, facts, bays_test1, True)
 #get index of min time factory
-#index_min = np.argmin(t_finish_test1)
-#min_value = min(t_finish_test1)
-#min_fact_test1=[facts[i] for i, x in enumerate(t_finish_test1) if x == min_value]
-#print(min_fact_test1)
+index_min = np.argmin(t_finish_test1)
+min_value = min(t_finish_test1)
+min_fact_test1=[facts[i] for i, x in enumerate(t_finish_test1) if x == min_value]
+print(min_fact_test1)
 
 
 
