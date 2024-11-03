@@ -20,9 +20,9 @@ for i in range (len(data['factory_locations'])):
 
 #Since there are 20k panels we will test using a bounding box:
 xmin=0
-xmax=250
+xmax=600
 ymin=750
-ymax=1000
+ymax=1250
 bbox=[(xmin,ymin), (xmax,ymin), (xmax,ymax), (xmin,ymax), (xmin,ymin)]
 #remove bays not in the box
 bays_test1=[]
@@ -32,10 +32,11 @@ for i in range(len(bays)):
     if x>=xmin and x<=xmax and y>=ymin and y<=ymax:
         bays_test1.append((x,y))
 
-
+print(len(bays_test1))
 # === Decision Variables ===
 
 def k_median_single_factory(bays, facts, n_vehicles, k):
+    print("start lp")
     bays_list=bays
     facts_list=facts
     bays = np.array(bays_list)
@@ -67,16 +68,19 @@ def k_median_single_factory(bays, facts, n_vehicles, k):
     problem.solve()
 
     # === Output the results ===
-    #print(f"Status: {pl.LpStatus[problem.status]}")
+    print(f"Status: {pl.LpStatus[problem.status]}")
     optimal_facts=[]
     for j in range(n_facts):
-        fact_time = run_factory(facts_list[j], bays_list, n_vehicles, True)
+        fact_time = run_factory(facts_list[j], bays_list, n_vehicles, False)
         fact_dist = sum(spd.cityblock(bays[i], facts[j]) for i in range(n_bays))
-        #print(f"Factory: {facts[j]}, Time: {fact_time}, Total Distance: {fact_dist}")
+        print(f"Factory: {facts[j]}, Time: {fact_time}, Total Distance: {fact_dist}")
         if Y[j].varValue == 1:
-            #print(f"Factory Chosen: {facts[j]}")
+            print(f"Factory Chosen: {facts[j]}")
             optimal_facts.append(facts[j])
     return optimal_facts
 
 
-#k_median_single_factory(bays_test1, facts, 2, 3)
+k_median_single_factory(bays_test1, facts, 3, 1)
+#facts = [(0,0),(50,50),(100,100)]
+#bays = [(50,50),(50,100),(100,50),(100,100),(100,150),(150,150)]
+#k_median_single_factory(bays, facts, 1, 1)

@@ -41,17 +41,17 @@ def run_factory(fact, bays, vehicles, sort):
                 installed.append(deliver_bay)
                 car = avail_cars.pop(0)
                 t_return[car] = deliver(fact, deliver_bay, t)
-        print("t = %i" %t)
-        print("Planned: {}".format(planned))
-        print("Built: {}".format(t_built))
-        print("Buffer: {}".format(buffer))
-        print("Installed: {}".format(installed))
-        print("Available Cars: {}".format(avail_cars))
-        print("Return Cars: {}".format(t_return))
+        # print("t = %i" %t)
+        # print("Planned: {}".format(planned))
+        # print("Built: {}".format(t_built))
+        # print("Buffer: {}".format(buffer))
+        # print("Installed: {}".format(installed))
+        # print("Available Cars: {}".format(avail_cars))
+        # print("Return Cars: {}".format(t_return))
 
         t += 1
     t_finish = np.max(t_return)
-    print("Finish Building at t = %i" %t_finish)
+    #print("Finish Building at t = %i" %t_finish)
     return t_finish
 
 def build(bay, t):
@@ -65,7 +65,7 @@ def deliver(fact, bay, t):
 
     distance = dist(fact, bay)
     travel = 2 * np.ceil(distance / v)
-    print(travel)
+    #print(travel)
     t_return = t + travel + T_install
     return t_return
 
