@@ -5,34 +5,9 @@ import scipy as sp
 import json
 import scipy.spatial.distance as spd
 
-# === Parameters ===
-# Inputs
-with open('test_data_20k.json', 'r') as file:
-    data = json.load(file)
 
-bays=[]
-facts=[]
-for i in range (len(data['bays'])):
-    bays.append((data['bays'][i]['x'], data['bays'][i]['y']))
 
-for i in range (len(data['factory_locations'])):
-    facts.append((data['factory_locations'][i]['x'], data['factory_locations'][i]['y']))
 
-#Since there are 20k panels we will test using a bounding box:
-xmin=0
-xmax=600
-ymin=750
-ymax=1250
-bbox=[(xmin,ymin), (xmax,ymin), (xmax,ymax), (xmin,ymax), (xmin,ymin)]
-#remove bays not in the box
-bays_test1=[]
-for i in range(len(bays)):
-    x=bays[i][0]
-    y=bays[i][1]
-    if x>=xmin and x<=xmax and y>=ymin and y<=ymax:
-        bays_test1.append((x,y))
-
-print(len(bays_test1))
 # === Decision Variables ===
 
 def k_median_single_factory(bays, facts, n_vehicles, k):
@@ -69,18 +44,73 @@ def k_median_single_factory(bays, facts, n_vehicles, k):
 
     # === Output the results ===
     print(f"Status: {pl.LpStatus[problem.status]}")
-    optimal_facts=[]
+    best_factories=[]
+    factory_assignments = {factory: [] for factory in facts_list}
+    
     for j in range(n_facts):
-        fact_time = run_factory(facts_list[j], bays_list, n_vehicles, False)
-        fact_dist = sum(spd.cityblock(bays[i], facts[j]) for i in range(n_bays))
-        print(f"Factory: {facts[j]}, Time: {fact_time}, Total Distance: {fact_dist}")
-        if Y[j].varValue == 1:
-            print(f"Factory Chosen: {facts[j]}")
-            optimal_facts.append(facts[j])
-    return optimal_facts
+        for i in range(n_bays):
+            if X[i][j].varValue == 1:
+                factory_assignments[facts_list[j]].append(bays_list[i])
 
 
-k_median_single_factory(bays_test1, facts, 3, 1)
+    # In single factory case, this prints out time for all factories
+    if k == 1:
+        for j in range(n_facts):
+            fact_time = run_factory(facts_list[j], bays_list, n_vehicles, True)
+            fact_dist = sum(spd.cityblock(bays[i], facts[j]) for i in range(n_bays))
+            print(f"Factory: {facts[j]}, Time: {fact_time}, Total Distance: {fact_dist}")
+
+            if Y[j].varValue == 1:
+                print(f"Factory Chosen: {facts[j]}")
+                best_factories.append(facts[j])
+                max_fact_time = fact_time
+                factory_assignments[facts_list[j]] = bays_list
+    else:
+        max_fact_time = 0
+        for j in range(n_facts):
+            if Y[j].varValue == 1:
+                best_factories.append(facts_list[j])
+                fact_time = run_factory(facts_list[j], factory_assignments[facts_list[j]], n_vehicles, True)
+                if fact_time > max_fact_time:
+                    max_fact_time = fact_time
+        print("Best Factory Locations:", best_factories)
+        print("Total Time Required:", max_fact_time)
+    
+
+    return best_factories, max_fact_time, factory_assignments
+
+
+#k_median_single_factory(bays_test1, facts, 3, 1)
 #facts = [(0,0),(50,50),(100,100)]
 #bays = [(50,50),(50,100),(100,50),(100,100),(100,150),(150,150)]
 #k_median_single_factory(bays, facts, 1, 1)
+
+if __name__ == "__main__":
+    # === Parameters ===
+    # Inputs
+    with open('test_data_20k.json', 'r') as file:
+        data = json.load(file)
+
+    bays=[]
+    facts=[]
+    for i in range (len(data['bays'])):
+        bays.append((data['bays'][i]['x'], data['bays'][i]['y']))
+
+    for i in range (len(data['factory_locations'])):
+        facts.append((data['factory_locations'][i]['x'], data['factory_locations'][i]['y']))
+
+    #Since there are 20k panels we will test using a bounding box:
+    xmin=0
+    xmax=600
+    ymin=750
+    ymax=1250
+    bbox=[(xmin,ymin), (xmax,ymin), (xmax,ymax), (xmin,ymax), (xmin,ymin)]
+    #remove bays not in the box
+    bays_test1=[]
+    for i in range(len(bays)):
+        x=bays[i][0]
+        y=bays[i][1]
+        if x>=xmin and x<=xmax and y>=ymin and y<=ymax:
+            bays_test1.append((x,y))
+
+    #print(len(bays_test1))
