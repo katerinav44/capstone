@@ -27,7 +27,8 @@ def k_median_single_factory(bays, facts, n_vehicles, k):
     # === Objective Function ===
     # Minimize k-median distance as a heuristic for time
     problem += (
-        sum(sum(spd.cityblock(bays[i], facts[j]) * X[i][j] for j in range(n_facts)) for i in range(n_bays))
+        #sum(sum(spd.cityblock(bays[i], facts[j]) * X[i][j] for j in range(n_facts)) for i in range(n_bays))
+        sum(sum(run_factory(facts_list[j], bays_list, n_vehicles, True) * X[i][j] for j in range(n_facts)) for i in range(n_bays))
     ), "k_median"
 
     # === Constraints ===
@@ -70,7 +71,8 @@ def k_median_single_factory(bays, facts, n_vehicles, k):
         for j in range(n_facts):
             if Y[j].varValue == 1:
                 best_factories.append(facts_list[j])
-                fact_time = run_factory(facts_list[j], factory_assignments[facts_list[j]], n_vehicles, True)
+                # changed to 1 vehicle - 3 vehicles localized = 1 vehicle per factory
+                fact_time = run_factory(facts_list[j], factory_assignments[facts_list[j]], 1, True)
                 if fact_time > max_fact_time:
                     max_fact_time = fact_time
         print("Best Factory Locations:", best_factories)
@@ -100,10 +102,10 @@ if __name__ == "__main__":
         facts.append((data['factory_locations'][i]['x'], data['factory_locations'][i]['y']))
 
     #Since there are 20k panels we will test using a bounding box:
-    xmin=0
+    xmin=400
     xmax=600
     ymin=750
-    ymax=1250
+    ymax=1000
     bbox=[(xmin,ymin), (xmax,ymin), (xmax,ymax), (xmin,ymax), (xmin,ymin)]
     #remove bays not in the box
     bays_test1=[]
@@ -112,5 +114,6 @@ if __name__ == "__main__":
         y=bays[i][1]
         if x>=xmin and x<=xmax and y>=ymin and y<=ymax:
             bays_test1.append((x,y))
+    k_median_single_factory(bays, facts, 3, 1)
 
     #print(len(bays_test1))

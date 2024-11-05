@@ -58,3 +58,7 @@ if __name__ == "__main__":
             plt.scatter(*zip(*assigned_bays), marker='.', color=color, label='bays assigned to factory '+str(factory))
     plt.plot(*zip(*bbox), color='blue', label='bounding box for test')
     plt.show()
+
+    # Heuristic
+    # Best Factory Locations: ((504, 1249), (61, 1513), (508, 381))
+    # Total Time Required: 32411.0

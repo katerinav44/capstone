@@ -121,19 +121,20 @@ def test_sort(vehicles, fact, bays):
     sort = True
     run_factory(fact, bays, vehicles, sort)
 
-max_vehicles = 5
-fact = (0,0)
-bays = convert_text_coordinates("panel_coordinates.txt")
-sort = False
-#test_vehicles(max_vehicles, fact, bays, sort)
+if __name__ == "__main__":
+    max_vehicles = 5
+    fact = (0,0)
+    bays = convert_text_coordinates("panel_coordinates.txt")
+    sort = False
+    #test_vehicles(max_vehicles, fact, bays, sort)
 
-vehicles = 3
-facts = [(900,6600),(3600,0),(8100,0),(8100,3600)]
-#test_factories(vehicles, facts, bays)
+    vehicles = 3
+    facts = [(900,6600),(3600,0),(8100,0),(8100,3600)]
+    #test_factories(vehicles, facts, bays)
 
-fact = facts[0]
-#test_sort(vehicles, fact, bays)
+    fact = facts[0]
+    #test_sort(vehicles, fact, bays)
 
-fact = (0,0)
-bays = [(100,100), (150,150)]
-run_factory(fact, bays, 2, True)
+    fact = (0,0)
+    bays = [(100,100), (150,150)]
+    run_factory(fact, bays, 2, True)

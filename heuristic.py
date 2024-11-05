@@ -16,7 +16,8 @@ def calculate_time(factory_locations, bays):
     
     constr_times=[]
     for factory, assigned_bays in factory_assignments.items():
-        constr_times.append(run_factory(factory, assigned_bays, 3, True))
+        # changed to 1 vehicle - 3 vehicles localized = 1 vehicle per factory
+        constr_times.append(run_factory(factory, assigned_bays, 1, True))
     #Since the factories are building at the same time, the time it would take to build the whole site corresponds to the maximum time among each construction group
     return max(constr_times), factory_assignments
 
