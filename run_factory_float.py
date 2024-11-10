@@ -1,13 +1,14 @@
 import numpy as np
 import scipy as sp
 import scipy.spatial.distance as spd
+import copy
 
 def run_factory_float(facts, fact_bay, vehicles):
     # facts: list of factory locations, used to index fact_bay
     # fact_bay: dictionary of bays assigned to factories
     t = 0
     buffer = {fact: [] for fact in facts}
-    planned = fact_bay.copy()
+    planned = copy.deepcopy(fact_bay)
     installed = []
     t_delivered = np.zeros(vehicles)
     # time vehicle finishes delivering bay 
@@ -17,7 +18,7 @@ def run_factory_float(facts, fact_bay, vehicles):
     car_loc = [(0,0)]*vehicles
 
     bays = []
-    for fact, assigned_bays in fact_bay.items():
+    for fact, assigned_bays in planned.items():
         for bay in assigned_bays:
             bays.append(bay)
 

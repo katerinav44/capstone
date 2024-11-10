@@ -29,7 +29,7 @@ def k_median_single_factory(bays, facts, n_vehicles, k):
     # X and Y decision variables
     X = pl.LpVariable.dicts("bay_factory", indices = (range(len(bays)), range(len(facts))), lowBound=0, upBound=1, cat='Binary')
     Y = pl.LpVariable.dicts("factory_chosen", indices = range(len(facts)), lowBound=0, upBound=1, cat='Binary')
-    z = pl.LpVariable("max_run_fact_time")
+    #z = pl.LpVariable("max_run_fact_time")
 
     # === Objective Function ===
     # Minimize k-median distance as a heuristic for time
@@ -65,7 +65,7 @@ def k_median_single_factory(bays, facts, n_vehicles, k):
         for i in range(n_bays):
             if X[i][j].varValue == 1:
                 factory_assignments[facts_list[j]].append(bays_list[i])
-    print(factory_assignments)
+    #print(factory_assignments)
 
     # In single factory case, this prints out time for all factories
     if k == 1:
@@ -78,20 +78,13 @@ def k_median_single_factory(bays, facts, n_vehicles, k):
                 print(f"Factory Chosen: {facts[j]}")
                 best_factories.append(facts[j])
                 max_fact_time = fact_time
-                factory_assignments[facts_list[j]] = bays_list
+                #factory_assignments[facts_list[j]] = bays_list
     else:
-       # max_fact_time = run_factory_float(facts_list, factory_assignments, 3)
-       max_fact_time = 0
-    #     for j in range(n_facts):
-    #         if Y[j].varValue == 1:
-    #             best_factories.append(facts_list[j])
-    #             fact_time = run_factory(facts_list[j], factory_assignments[facts_list[j]], n_vehicles, True)
-    #             if fact_time > max_fact_time:
-    #                 max_fact_time = fact_time
-    #     print("Best Factory Locations:", best_factories)
-    #     print("Total Time Required:", max_fact_time)
-    
-
+        max_fact_time = run_factory_float(facts_list, factory_assignments, n_vehicles)
+        for j in range(n_facts):
+            if Y[j].varValue == 1:
+                best_factories.append(facts_list[j])
+    #print(factory_assignments)
     return best_factories, max_fact_time, factory_assignments
 
 
@@ -131,8 +124,10 @@ if __name__ == "__main__":
     #facts = [(0,0),(50,50),(100,100)]
     #bays_test1 = [(50,50),(50,100),(100,50),(500,500),(600,600),(700,700)]
 
-    best_factories, max_fact_time, factory_assignments = k_median_single_factory(bays_test1, facts, 1, 3)
-    print(run_factory_float(facts, factory_assignments, 3))
+    best_factories, max_fact_time, factory_assignments = k_median_single_factory(bays_test1, facts, 3, 3)
+    print(best_factories)
+    print(factory_assignments)
+    run_factory_float(facts, factory_assignments, 3)
 
     # X = [[0,1],[1,0]]
     # bays_list = [(1,0),(2,2)]

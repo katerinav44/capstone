@@ -51,7 +51,7 @@ def run_factory(fact, bays, vehicles, sort):
 
         t += 1
     t_finish = np.max(t_return)
-    print("Finish Building at t = %i" %t_finish)
+    #print("Finish Building at t = %i" %t_finish)
     return t_finish
 
 def build(bay, t):
