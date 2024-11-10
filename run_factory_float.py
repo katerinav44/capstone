@@ -6,31 +6,31 @@ def run_factory_float(facts, fact_bay, vehicles):
     # facts: list of factory locations, used to index fact_bay
     # fact_bay: dictionary of bays assigned to factories
     t = 0
-    buffer = {factory: [] for factory in facts}
+    buffer = {fact: [] for fact in facts}
     planned = fact_bay.copy()
     installed = []
     t_delivered = np.zeros(vehicles)
     # time vehicle finishes delivering bay 
 
-    t_built = {factory: [] for factory in facts}
+    t_built = {fact: [] for fact in facts}
     avail_cars = []
     car_loc = [(0,0)]*vehicles
-    print(car_loc)
 
     bays = []
-    for factory, assigned_bays in fact_bay.items():
+    for fact, assigned_bays in fact_bay.items():
         for bay in assigned_bays:
             bays.append(bay)
-    print(bays)
-    bays = sort_by_dist(bays, (0,0)) # enable comparison in while loop
-    print(bays)
 
 
-    while installed != bays:
+    while len(installed) < len(bays):
         for i in range(vehicles):
             # car has finished delivery + install
             if t == t_delivered[i]:
                 avail_cars.append(i)
+
+        # resorting facts so that no single fact sweeps the newly available cars
+        remaining = [len(planned[fact]) for fact in facts]
+        facts = [fact for _, fact in sorted(zip(remaining, facts), reverse=True)]
         
         # building a new bay
         for fact in facts:
@@ -62,16 +62,22 @@ def run_factory_float(facts, fact_bay, vehicles):
                     car = avail_cars.pop(car_min)
                     t_delivered[car], car_next = deliver(fact, deliver_bay, t, car_loc[car])
                     car_loc[car] = car_next
-
-        installed = sort_by_dist(installed, (0,0))
         
-        print("t = %i" %t)
-        print("Planned: {}".format(planned))
-        print("Built: {}".format(t_built))
-        print("Buffer: {}".format(buffer))
-        print("Installed: {}".format(installed))
-        print("Available Cars: {}".format(avail_cars))
-        print("Return Cars: {}".format(t_delivered))
+        # if t % 5000 == 0:
+        #     print("t = %i" %t)
+        #     print("Planned: {}".format(planned))
+        #     print("Built: {}".format(t_built))
+        #     print("Buffer: {}".format(buffer))
+        #     print("Installed: {}".format(installed))
+            # print(len(bays))
+            # print(len(installed))
+            # print("Available Cars: {}".format(avail_cars))
+            # print("Return Cars: {}".format(t_delivered))
+            # print("Car locations: {}".format(car_loc))
+            # for fact in facts:
+            #     print("Factory: {}".format(fact))
+            #     # print("Buffer length: {}".format(len(buffer[fact])))
+            #     print("Remaining bays: {}".format(len(planned[fact])))
 
         t += 1
 
@@ -150,7 +156,11 @@ def test_sort(vehicles, fact, bays):
 if __name__ == "__main__":
     #run_factory_float(facts, fact_bay, vehicles)
 
-    facts = [(0,0),(10,10),(20,20)]
-    fact_bay = {(0,0): [(1,2),(1,3),(1,4)], (10,10): [(9,8),(10,8)], (20,20): [(6,6)]}
-    vehicles = 3
+    facts = [(900,6600),(900,6601),(600,600),(100,100)]
+    #fact_bay = {(0,0): [(1,2),(1,3),(1,4)], (10,10): [(9,8),(10,8)], (20,20): [(6,6)], (100,100) : []}
+    vehicles = 6
+    
+
+    bays = convert_text_coordinates("panel_coordinates.txt")
+    fact_bay = {(900,6600): bays[0:3000], (600,600): [], (900,6601): bays[3000:len(bays)], (100,100) : []}
     run_factory_float(facts, fact_bay, vehicles)
