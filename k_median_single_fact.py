@@ -125,4 +125,3 @@ if __name__ == "__main__":
     #bays_test1 = [(50,50),(50,100),(100,50),(500,500),(600,600),(700,700)]
     k_median_single_factory(bays_test1, facts, 1, 1)
 
-    #print(len(bays_test1))
