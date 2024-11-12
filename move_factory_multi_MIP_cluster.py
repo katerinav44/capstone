@@ -4,6 +4,7 @@ import numpy as np
 import json
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
+from run_factory import *
 from scipy.spatial import distance
 
 def cluster_bays(bays, num_clusters=1000):
