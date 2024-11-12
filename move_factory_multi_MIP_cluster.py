@@ -21,7 +21,7 @@ def cluster_bays(bays, num_clusters=1000):
     return cluster_centers, bay_weights, kmeans.labels_
 
 
-def k_median_single_factory_moving(bays, facts, n_vehicles, n_factories, num_clusters=50):
+def k_means_single_factory_moving(bays, facts, n_vehicles, n_factories, num_clusters=50):
     # Cluster bay locations to reduce problem size
     cluster_centers, bay_weights, labels = cluster_bays(bays, num_clusters=num_clusters)
     facts_L = facts
@@ -138,7 +138,7 @@ if __name__ == "__main__":
     n_factories = 2
     n_vehicles = 3
     n_locations = len(facts)
-    factory_assignments, start_times, end_times = k_median_single_factory_moving(bays, facts, n_vehicles, n_factories)
+    factory_assignments, start_times, end_times = k_means_single_factory_moving(bays, facts, n_vehicles, n_factories)
 
     #plot results
     plt.figure(figsize=(10,10))
