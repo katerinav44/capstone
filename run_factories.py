@@ -178,16 +178,6 @@ def sort_by_dist(coordinates, fact):
 
 
 if __name__ == "__main__":
-    #run_factory_float(facts, fact_bay, vehicles)
-
-    #facts = [(900,6600),(900,6601),(600,600),(100,100)]
-    #fact_bay = {(0,0): [(1,2),(1,3),(1,4)], (10,10): [(9,8),(10,8)], (20,20): [(6,6)], (100,100) : []}
-    #vehicles = 6
-    
-
-    #bays = convert_text_coordinates("panel_coordinates.txt")
-    #fact_bay = {(900,6600): bays[0:3000], (600,600): [], (900,6601): bays[3000:len(bays)], (100,100) : []}
-    #run_factory_float(facts, fact_bay, vehicles)
     factory_assignments = {0: {(0,0): [(100,100),(200,200)],
                                 (10,10): [],
                                 (20,20): [(300,300)],
