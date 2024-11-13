@@ -37,13 +37,13 @@ def k_median_single_factory(bays, facts, n_vehicles, k):
     # Minimize k-median distance as a heuristic for time
     problem += (
         # (0) Standard using sum of manhattan distances
-        sum(sum(spd.cityblock(bays[i], facts[j]) * X[i][j] for j in range(n_facts)) for i in range(n_bays))
+        #sum(sum(spd.cityblock(bays[i], facts[j]) * X[i][j] for j in range(n_facts)) for i in range(n_bays))
 
         # (1) using run factory - this only works for single factory
         # sum(d[j] * Y[j] for j in range(n_facts))
 
         # (Attempt 2 - run_factory k > 1) 
-        #sum(run_factory(facts_list[j], [bays_list[i] for i in range(n_bays) if X[i][j] == 1], 1, True) for j in range(n_facts)) 
+        sum(run_factory(facts_list[j], [bays_list[i] for i in range(n_bays) if X[i][j] == 1], 1, True) for j in range(n_facts)) 
         # (3) using run factory on a selection of bays
         #z
     ), "k_median"
