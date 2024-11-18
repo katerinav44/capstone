@@ -3,6 +3,7 @@ from pulp import LpProblem, LpMinimize, PULP_CBC_CMD, GUROBI
 import numpy as np
 import json
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 from sklearn.cluster import KMeans
 from run_factory import *
 from scipy.spatial import distance
@@ -136,31 +137,51 @@ if __name__ == "__main__":
         if xmin <= x <= xmax and ymin <= y <= ymax:
             bays_test1.append((x, y))
 
-    n_factories = 2
+    n_factories = 5
     n_vehicles = 3
     n_locations = len(facts)
     factory_assignments, start_times, end_times = k_means_single_factory_moving(bays, facts, n_vehicles, n_factories)
 
-    #plot results
-    plt.figure(figsize=(10,10))
-    plt.scatter(*zip(*bays), marker='.', color='k', label='bays')
-    plt.scatter(*zip(*facts), marker='x', color='k', label='factories')
+    # Define one color for each factory
+    color_palette = plt.get_cmap('Set1')
+    factory_colors = [color_palette(i % 10) for i in range(n_factories)]  # Cycle if n_factories > 10
 
+    # Plot results
+    plt.figure(figsize=(10, 10))
+
+    def generate_distinct_shades(base_color, num_shades): 
+        h, l, s = mcolors.rgb_to_hsv(base_color[:3])  # Convert to HSV 
+        shades = []
+        for i in range(num_shades):
+            # Adjust hue, lightness and saturation 
+            new_h = (h + 0.025* (i - num_shades // 2)) % 1.0 
+            new_l = max(0, min(l - 0.1 * (i - num_shades // 2), 1.0))  # Increase or dec lightness
+            new_s = max(0, min(s - 0.03 * (i - num_shades // 2), 1.0))  # Slightly saturate
+            shades.append(mcolors.hsv_to_rgb((new_h, new_l, new_s)))
+        return shades
+    
+    # Plot each bay and factory with consistent coloring per factory
     for j in range(n_factories):
-        #color=np.random.choice(range(256), size=3)/256
-        k = 0
-        for factory, assigned_bays in factory_assignments[j].items():
-            k += 1
-            if assigned_bays != []: #no bays assigned to factory
-                #c = color / n_locations * k
-                c=np.random.choice(range(256), size=3)/256
-                i=list(factory_assignments[j].keys()).index(factory)
-                plt.scatter(factory[0], factory[1], marker='o',s=70, color=c)
-                plt.scatter(*zip(*assigned_bays), marker='.', color=c, label='bays assigned to factory '+str(factory)+' at time t='+str(start_times[j][i]))
-    #plt.plot(*zip(*bbox), color='blue', label='bounding box for test')
+        color = factory_colors[j]  #color for each factory
+        shades = generate_distinct_shades(color, len(factory_assignments[j]))
+    
+        for i, (factory, assigned_bays) in enumerate(factory_assignments[j].items()):
+            if assigned_bays:  # Only plot if there are bays assigned to the factory at this location
+                color = shades[i]
+                plt.scatter(factory[0], factory[1], marker='o', s=70, color=color)
+            
+                # Plot the bays assigned to this factory
+                plt.scatter(*zip(*assigned_bays), marker='.', color=color,  
+                        label=f'bays assigned to factory {factory} at t={start_times[j][i]}')
+
+    # Plot bounding box 
+    # plt.plot(*zip(*bbox), color='blue', label='bounding box for test')
+
+    # Set plot labels and title
     plt.xlabel('x')
     plt.ylabel('y')
     plt.legend(loc='lower left')
-    ttm=max(max(v) for k, v in end_times.items())
-    plt.title('Total time: '+str(ttm) +'min')
+    ttm = max(max(v) for v in end_times.values())
+    plt.title(f'Total build time: {ttm} min. Number of factories: {n_factories}')
     plt.show()
+    
