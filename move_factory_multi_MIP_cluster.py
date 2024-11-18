@@ -24,7 +24,7 @@ def cluster_bays(bays, num_clusters=1000):
     return cluster_centers, bay_weights, kmeans.labels_
 
 
-def k_means_single_factory_moving(bays, facts, n_vehicles, n_factories, num_clusters=50):
+def multi_MIP(bays, facts, n_vehicles, n_factories, num_clusters=50):
     # Cluster bay locations to reduce problem size
     cluster_centers, bay_weights, labels = cluster_bays(bays, num_clusters=num_clusters)
     facts_L = facts
@@ -99,6 +99,7 @@ def k_means_single_factory_moving(bays, facts, n_vehicles, n_factories, num_clus
 
     # === Compute construction and movement times  ===
     t_finish, factory_start_time, factory_finish_time=run_factories(factory_assignments, n_vehicles)
+    print(factory_start_time, factory_finish_time)
     # factory_start_time = {}
     # factory_finish_time = {}
 
@@ -142,7 +143,8 @@ if __name__ == "__main__":
     n_factories = 2
     n_vehicles = 3
     n_locations = len(facts)
-    factory_assignments, start_times, end_times = k_means_single_factory_moving(bays, facts, n_vehicles, n_factories)
+    print(n_locations)
+    factory_assignments, start_times, end_times = multi_MIP(bays, facts, n_vehicles, n_factories)
 
     # Define one color for each factory
     color_palette = plt.get_cmap('Set1')
