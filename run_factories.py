@@ -109,21 +109,21 @@ def run_factories(factory_assignments, vehicles):
                     t_delivered[car], car_next = deliver(fact, deliver_bay, t, car_loc[car])
                     car_loc[car] = car_next
         # if t % 5000 == 0:
-        print("t = %i" %t)
-        for j in range(n_factories):
-            if fact_complete[j] == 1:
-                print("Factory {} is completed".format(j))
-            elif t < t_moved[j]:
-                print("Factory {} is moving to {}".format(j, cur_fact[j]))
-            else:
-                print("Factory {} is at location {}, {}".format(j, fact_index[j], cur_fact[j]))
-                print("Buffer length: {}".format(len(buffer[j])))
-                print("Remaining bays at this location: {}".format(len(planned[j][cur_fact[j]])))
+        #print("t = %i" %t)
+        #for j in range(n_factories):
+            #if fact_complete[j] == 1:
+                #print("Factory {} is completed".format(j))
+            #elif t < t_moved[j]:
+                #print("Factory {} is moving to {}".format(j, cur_fact[j]))
+            #else:
+                #print("Factory {} is at location {}, {}".format(j, fact_index[j], cur_fact[j]))
+                #print("Buffer length: {}".format(len(buffer[j])))
+                #print("Remaining bays at this location: {}".format(len(planned[j][cur_fact[j]])))
 
         t += 1
 
     t_finish = np.max(t_delivered)
-    print("Finish Building at t = %i" %t_finish)
+    #print("Finish Building at t = %i" %t_finish)
     return t_finish, factory_start_time, factory_finish_time
 
 def build(t):
@@ -186,4 +186,4 @@ if __name__ == "__main__":
                                 (10,10): [(150,150)],
                                 (20,20): [],
                                 (30,30): [(250,250)]}}
-    run_factories(factory_assignments, 3)
+    print(run_factories(factory_assignments, 3))

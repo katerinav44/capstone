@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from sklearn.cluster import KMeans
 from run_factory import *
+from run_factories import *
 from scipy.spatial import distance
 
 def cluster_bays(bays, num_clusters=1000):
@@ -97,22 +98,23 @@ def k_means_single_factory_moving(bays, facts, n_vehicles, n_factories, num_clus
             factory_assignments[j][tuple(location)].extend(assigned_bays)
 
     # === Compute construction and movement times  ===
-    factory_start_time = {}
-    factory_finish_time = {}
+    t_finish, factory_start_time, factory_finish_time=run_factories(factory_assignments, n_vehicles)
+    # factory_start_time = {}
+    # factory_finish_time = {}
 
-    for j in range(n_factories):
-        current_time = 0
-        factory_start_time[j] = []
-        factory_finish_time[j] = []
-        for k in range(n_locations):
-            if factory_assignments[j][tuple(facts_L[k])]:
-                factory_start_time[j].append(current_time)
-                current_time += run_factory(facts_L[k], factory_assignments[j][facts_L[k]], n_vehicles, True)
-                factory_finish_time[j].append(current_time)
-                current_time += movement_penalty
-            else:
-                factory_start_time[j].append(-1)  # No bays assigned to the factory
-                factory_finish_time[j].append(-1)
+    # for j in range(n_factories):
+    #     current_time = 0
+    #     factory_start_time[j] = []
+    #     factory_finish_time[j] = []
+    #     for k in range(n_locations):
+    #         if factory_assignments[j][tuple(facts_L[k])]:
+    #             factory_start_time[j].append(current_time)
+    #             current_time += run_factory(facts_L[k], factory_assignments[j][facts_L[k]], n_vehicles, True)
+    #             factory_finish_time[j].append(current_time)
+    #             current_time += movement_penalty
+    #         else:
+    #             factory_start_time[j].append(-1)  # No bays assigned to the factory
+    #             factory_finish_time[j].append(-1)
 
     return factory_assignments, factory_start_time, factory_finish_time
 
@@ -137,7 +139,7 @@ if __name__ == "__main__":
         if xmin <= x <= xmax and ymin <= y <= ymax:
             bays_test1.append((x, y))
 
-    n_factories = 5
+    n_factories = 2
     n_vehicles = 3
     n_locations = len(facts)
     factory_assignments, start_times, end_times = k_means_single_factory_moving(bays, facts, n_vehicles, n_factories)
