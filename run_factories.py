@@ -123,8 +123,10 @@ def run_factories(factory_assignments, vehicles):
         t += 1
 
     t_finish = np.max(t_delivered)
-    #print("Finish Building at t = %i" %t_finish)
-    return t_finish, factory_start_time, factory_finish_time
+    cost = estimate_cost(t_finish, vehicles, n_factories)
+    print("Finish Building at t = %i min" %t_finish)
+    print("Cost estimate: %i USD" %cost)
+    return t_finish, factory_start_time, factory_finish_time, cost
 
 def build(t):
     T_bay = 5 # 4-5 min to assembly
@@ -176,6 +178,27 @@ def sort_by_dist(coordinates, fact):
     coordinates.sort(key = lambda p: np.abs(p[0] - fact[0]) + np.abs(p[1] - fact[1]))
     return coordinates
 
+def estimate_cost(time, vehicles, factories):
+    hours = time / 60
+
+    # factory and vehicle depreciation rate
+    d_factory = 10
+    d_vehicle = 2
+
+    # labor parameters
+    c_labor = 25
+    N_factory = 3
+    N_field = 3
+    N_vehicle = 1
+    
+    factory_cost = hours * factories * d_factory
+    vehicle_cost = hours * vehicles * d_vehicle
+    factory_labor = factories * (N_factory + N_field)
+    vehicle_labor = vehicles * N_vehicle
+    labor_cost = hours * c_labor * (factory_labor + vehicle_labor)
+
+    total_cost = factory_cost + vehicle_cost + labor_cost
+    return total_cost
 
 if __name__ == "__main__":
     factory_assignments = {0: {(0,0): [(100,100),(200,200)],
@@ -186,4 +209,4 @@ if __name__ == "__main__":
                                 (10,10): [(150,150)],
                                 (20,20): [],
                                 (30,30): [(250,250)]}}
-    print(run_factories(factory_assignments, 3))
+    run_factories(factory_assignments, 3)
