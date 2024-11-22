@@ -6,73 +6,75 @@ from move_factory_multi_MIP_cluster import *
 from run_factories import *
 from run_factory import *
 
-def animate_factories(bays, factory_assignments, start_times, end_times, n_factories, speed_up_factor=1000):
-    """
-    Create an animated visualization of factory movements.
-    
-    Parameters:
-    - bays: List of bay coordinates.
-    - factory_assignments: Factory assignments.
-    - start_times: Start times for factory operation at each location.
-    - end_times: End times for factory operation at each location.
-    - n_factories: Number of factories.
-    - speed_up_factor: Factor by which to scale down time.
-    """
-    fig, ax = plt.subplots(figsize=(10, 10))
-    ax.set_xlim(min(x for x, _ in bays), max(x for x, _ in bays))
-    ax.set_ylim(min(y for _, y in bays), max(y for _, y in bays))
-    
-    # Plot all bays
-    bay_scatter = ax.scatter(*zip(*bays), color='gray', s=5, label='Bays')
-    
-    # Initialize scatter plots for factories
-    factory_scatter = [
-        ax.scatter([], [], s=100, label=f'Factory {j + 1}') for j in range(n_factories)
-    ]
-    
-    # Scale times and filter out -1 values
-    scaled_start_times = {
-        j: [t / speed_up_factor if t != -1 else np.inf for t in times]
-        for j, times in start_times.items()
-    }
-    scaled_end_times = {
-        j: [t / speed_up_factor if t != -1 else np.inf for t in times]
-        for j, times in end_times.items()
-    }
-    
-    # Calculate total animation time, excluding infinities
-    total_time = max(
-        max(t for t in times if t != np.inf) for times in scaled_end_times.values()
-    )
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib.animation import FuncAnimation, PillowWriter
+from matplotlib.colors import ListedColormap
 
-    def init():
-        """Initialize the animation."""
-        for scatter in factory_scatter:
-            scatter.set_offsets(np.array([]).reshape(0, 2))  # Empty scatter for each factory
-        return factory_scatter
+def animate_factories(bays_timeline, factory_timeline):
+    fig, ax = plt.subplots()
 
-    def update(frame):
-        """Update the positions of factories at each frame."""
-        for j, scatter in enumerate(factory_scatter):
-            active_locations = [
-                loc for i, loc in enumerate(factory_assignments[j])
-                if scaled_start_times[j][i] <= frame <= scaled_end_times[j][i]
-            ]
-            scatter.set_offsets(active_locations)
-        return factory_scatter
-
-    ani = animation.FuncAnimation(
-        fig,
-        update,
-        frames=range(int(total_time) + 1),
-        init_func=init,
-        blit=False,  # Disable blitting for backend compatibility
-        repeat=False
-    )
+    # Set up the scatter plot
+    bay_scatter = ax.scatter([], [],marker='.', c='gray', label='Bays')
+    factory_scatter = ax.scatter([], [], c='black', label='Factories')
 
     ax.legend()
+    ax.set_xlim(0, 1250)  # Adjust limits as per your data
+    ax.set_ylim(0, 2000)
+    ax.set_title('Site construction with 2 factories and 6 vehicles')
+
+    # Define a custom colormap
+    factory_colormap = ListedColormap(['black', 'red'])  # Black for inactive, red for active
+
+    def init():
+        # Initialize empty 2D arrays for scatter data
+        bay_scatter.set_offsets(np.empty((0, 2)))
+        factory_scatter.set_offsets(np.empty((0, 2)))
+        factory_scatter.set_array(np.array([]))  # Clear previous colors
+        return factory_scatter, bay_scatter
+
+    def update(frame):
+        # Extract bays that are active up to the current frame
+        active_bays = np.array([coords for time, coords in bays_timeline if time <= frame])
+        
+        # Determine active factories based on start and end times
+        active_factories = []
+        inactive_factories = []
+        for coords, start_time, end_time in factory_timeline:
+            if start_time <= frame <= end_time:
+                active_factories.append(coords)
+            else:
+                inactive_factories.append(coords)
+
+        # Update scatter data for bays
+        bay_scatter.set_offsets(active_bays if len(active_bays) > 0 else np.empty((0, 2)))
+        
+        # Determine color mapping: 0 for inactive (black), 1 for active (red)
+        factory_colors = [1 if coords not in inactive_factories else 0 for coords in active_factories]
+        
+        # Update factory positions and their color (inactive factories are black)
+        factory_scatter.set_offsets(active_factories if len(active_factories) > 0 else np.empty((0, 2)))
+        factory_scatter.set_array(np.array(factory_colors))  # Update factory colors with numeric values
+        
+        # Set the colormap
+        factory_scatter.set_cmap(factory_colormap)
+
+        return factory_scatter, bay_scatter
+
+    # Determine total frames based on timeline and skip frames for speed
+    total_frames = int(max(t for t, _ in bays_timeline) + 1)
+    skip_rate = 100 # Adjust this to skip more frames
+    frames = range(0, total_frames, skip_rate)
+
+    # Set up the animation with higher speed
+    anim = animation.FuncAnimation(
+        fig, update, frames=frames, init_func=init, blit=False, interval=50  # interval in milliseconds
+    )
+    # Save the animation as a GIF using PillowWriter
+    writer = PillowWriter(fps=1000)  # Frames per second
+    anim.save("factory_animation.gif", writer=writer)
     plt.show()
-    return ani
+
 
 
 with open('test_data_20k.json', 'r') as file:
@@ -98,7 +100,15 @@ for i in range(len(bays)):
 n_factories = 2
 n_vehicles = 3
 n_locations = len(facts)
-factory_assignments, start_times, end_times = multi_MIP(bays, facts, n_vehicles, n_factories)
+factory_assignments, start_times, end_times, bay_timeline = multi_MIP(bays, facts, n_vehicles, n_factories)
 print(end_times)
 # Call the animation function with data
-ani = animate_factories(bays, factory_assignments, start_times, end_times, n_factories)
+factory_timeline = [
+    (factory_position, start_time, end_time)
+    for factory in range(n_factories)
+    for factory_position, start_time, end_time
+    in zip(facts, start_times[factory], end_times[factory])
+    if start_time != -1  # Ignore locations where no work was done
+]
+
+ani = animate_factories(bay_timeline, factory_timeline)

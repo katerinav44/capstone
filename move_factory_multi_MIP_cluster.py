@@ -98,7 +98,7 @@ def multi_MIP(bays, facts, n_vehicles, n_factories, num_clusters=50):
             factory_assignments[j][tuple(location)].extend(assigned_bays)
 
     # === Compute construction and movement times  ===
-    t_finish, factory_start_time, factory_finish_time=run_factories(factory_assignments, n_vehicles)
+    t_finish, factory_start_time, factory_finish_time, bay_timeline=run_factories_ani(factory_assignments, n_vehicles)
     print(factory_start_time, factory_finish_time)
     # factory_start_time = {}
     # factory_finish_time = {}
@@ -117,7 +117,7 @@ def multi_MIP(bays, facts, n_vehicles, n_factories, num_clusters=50):
     #             factory_start_time[j].append(-1)  # No bays assigned to the factory
     #             factory_finish_time[j].append(-1)
 
-    return factory_assignments, factory_start_time, factory_finish_time
+    return factory_assignments, factory_start_time, factory_finish_time, bay_timeline
 
 if __name__ == "__main__":
     with open('test_data_20k.json', 'r') as file:
