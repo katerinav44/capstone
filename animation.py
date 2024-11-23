@@ -10,8 +10,16 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.animation import FuncAnimation, PillowWriter
 from matplotlib.colors import ListedColormap
+from matplotlib import colormaps
 
-def animate_factories(bays_timeline, factory_timeline):
+def animate_factories(bays_timeline, factory_timeline, factory_assignments):
+
+    bay_to_factory = {}
+    for fact, coords in factory_assignments.items():
+        for coord, bays in coords.items():
+            for bay in bays:
+                bay_to_factory[bay] = fact
+
     fig, ax = plt.subplots()
 
     # Set up the scatter plot
@@ -24,7 +32,7 @@ def animate_factories(bays_timeline, factory_timeline):
     ax.set_title('Site construction with 2 factories and 6 vehicles')
 
     # Define a custom colormap
-    factory_colormap = ListedColormap(['black', 'red'])  # Black for inactive, red for active
+    factory_colormap = colormaps['Set2']  # Black for inactive, red for active
 
     def init():
         # Initialize empty 2D arrays for scatter data
@@ -35,35 +43,36 @@ def animate_factories(bays_timeline, factory_timeline):
 
     def update(frame):
         # Extract bays that are active up to the current frame
-        active_bays = np.array([coords for time, coords in bays_timeline if time <= frame])
-        
+        active_bays = [coords for time, coords in bays_timeline if time <= frame]
+        bay_colors = [bay_to_factory[bay]/(len(factory_assignments) - 1) for bay in active_bays]
+
         # Determine active factories based on start and end times
         active_factories = []
-        inactive_factories = []
+        factory_colors = []
         for coords, start_time, end_time in factory_timeline:
             if start_time <= frame <= end_time:
                 active_factories.append(coords)
-            else:
-                inactive_factories.append(coords)
+                for fact in factory_assignments.keys():
+                    if factory_assignments[fact][coords]:
+                        factory_colors.append(fact/(len(factory_assignments) - 1))
 
         # Update scatter data for bays
-        bay_scatter.set_offsets(active_bays if len(active_bays) > 0 else np.empty((0, 2)))
+        bay_scatter.set_offsets(np.array(active_bays) if len(active_bays) > 0 else np.empty((0, 2)))
+        bay_scatter.set_array(np.array(bay_colors))
         
-        # Determine color mapping: 0 for inactive (black), 1 for active (red)
-        factory_colors = [1 if coords not in inactive_factories else 0 for coords in active_factories]
-        
-        # Update factory positions and their color (inactive factories are black)
-        factory_scatter.set_offsets(active_factories if len(active_factories) > 0 else np.empty((0, 2)))
+        # Update factory positions and their color
+        factory_scatter.set_offsets(active_factories)
         factory_scatter.set_array(np.array(factory_colors))  # Update factory colors with numeric values
         
         # Set the colormap
         factory_scatter.set_cmap(factory_colormap)
+        bay_scatter.set_cmap(factory_colormap)
 
         return factory_scatter, bay_scatter
 
     # Determine total frames based on timeline and skip frames for speed
     total_frames = int(max(t for t, _ in bays_timeline) + 1)
-    skip_rate = 100 # Adjust this to skip more frames
+    skip_rate = 500 # Adjust this to skip more frames
     frames = range(0, total_frames, skip_rate)
 
     # Set up the animation with higher speed
@@ -72,9 +81,8 @@ def animate_factories(bays_timeline, factory_timeline):
     )
     # Save the animation as a GIF using PillowWriter
     writer = PillowWriter(fps=1000)  # Frames per second
-    anim.save("factory_animation.gif", writer=writer)
     plt.show()
-
+    anim.save("factory_animation.gif", writer=writer)
 
 
 with open('test_data_20k.json', 'r') as file:
@@ -111,4 +119,4 @@ factory_timeline = [
     if start_time != -1  # Ignore locations where no work was done
 ]
 
-ani = animate_factories(bay_timeline, factory_timeline)
+ani = animate_factories(bay_timeline, factory_timeline, factory_assignments)
