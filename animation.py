@@ -50,31 +50,31 @@ def animate_factories(bays_timeline, factory_timeline, factory_assignments):
         active_factories = []
         factory_colors = []
         for coords, start_time, end_time in factory_timeline:
-            if start_time <= frame <= end_time:
+            if start_time <= frame <=end_time:
                 active_factories.append(coords)
                 for fact in factory_assignments.keys():
                     if factory_assignments[fact][coords]:
                         factory_colors.append(fact/(len(factory_assignments) - 1))
 
         # Update scatter data for bays
-        bay_scatter.set_offsets(np.array(active_bays) if len(active_bays) > 0 else np.empty((0, 2)))
+        bay_scatter.set_offsets(np.array(active_bays) if len(active_bays) else np.empty((0, 2)))
         bay_scatter.set_array(np.array(bay_colors))
         
         # Update factory positions and their color
-        factory_scatter.set_offsets(active_factories)
+        factory_scatter.set_offsets(np.array(active_factories) if len(active_factories) else np.empty((0,2)))
         factory_scatter.set_array(np.array(factory_colors))  # Update factory colors with numeric values
         
         # Set the colormap
         factory_scatter.set_cmap(factory_colormap)
         bay_scatter.set_cmap(factory_colormap)
-
+        
         return factory_scatter, bay_scatter
 
     # Determine total frames based on timeline and skip frames for speed
     total_frames = int(max(t for t, _ in bays_timeline) + 1)
     skip_rate = 500 # Adjust this to skip more frames
     frames = range(0, total_frames, skip_rate)
-
+    
     # Set up the animation with higher speed
     anim = animation.FuncAnimation(
         fig, update, frames=frames, init_func=init, blit=False, interval=50  # interval in milliseconds
@@ -109,7 +109,7 @@ n_factories = 2
 n_vehicles = 3
 n_locations = len(facts)
 factory_assignments, start_times, end_times, bay_timeline = multi_MIP(bays, facts, n_vehicles, n_factories)
-print(end_times)
+print(start_times)
 # Call the animation function with data
 factory_timeline = [
     (factory_position, start_time, end_time)
@@ -118,5 +118,5 @@ factory_timeline = [
     in zip(facts, start_times[factory], end_times[factory])
     if start_time != -1  # Ignore locations where no work was done
 ]
-
+print(factory_timeline)
 ani = animate_factories(bay_timeline, factory_timeline, factory_assignments)

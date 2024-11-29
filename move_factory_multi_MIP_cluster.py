@@ -98,7 +98,7 @@ def multi_MIP(bays, facts, n_vehicles, n_factories, num_clusters=50):
             factory_assignments[j][tuple(location)].extend(assigned_bays)
 
     # === Compute construction and movement times  ===
-    t_finish, factory_start_time, factory_finish_time, bay_timeline=run_factories_ani(factory_assignments, n_vehicles)
+    t_finish, factory_start_time, factory_finish_time, cost=run_factories(factory_assignments, n_vehicles)
     print(factory_start_time, factory_finish_time)
     # factory_start_time = {}
     # factory_finish_time = {}
@@ -117,7 +117,7 @@ def multi_MIP(bays, facts, n_vehicles, n_factories, num_clusters=50):
     #             factory_start_time[j].append(-1)  # No bays assigned to the factory
     #             factory_finish_time[j].append(-1)
 
-    return factory_assignments, factory_start_time, factory_finish_time, bay_timeline
+    return factory_assignments, factory_start_time, factory_finish_time, cost
 
 if __name__ == "__main__":
     with open('test_data_20k.json', 'r') as file:
@@ -140,11 +140,11 @@ if __name__ == "__main__":
         if xmin <= x <= xmax and ymin <= y <= ymax:
             bays_test1.append((x, y))
 
-    n_factories = 2
+    n_factories = 3
     n_vehicles = 3
     n_locations = len(facts)
     print(n_locations)
-    factory_assignments, start_times, end_times = multi_MIP(bays, facts, n_vehicles, n_factories)
+    factory_assignments, start_times, end_times, cost = multi_MIP(bays, facts, n_vehicles, n_factories)
 
     # Define one color for each factory
     color_palette = plt.get_cmap('Set1')
@@ -186,6 +186,8 @@ if __name__ == "__main__":
     plt.ylabel('y')
     plt.legend(loc='lower left')
     ttm = max(max(v) for v in end_times.values())
-    plt.title(f'Total build time: {ttm} min. Number of factories: {n_factories}')
+    plt.suptitle(f'Total build time: {ttm} min. Cost: ${cost:.2f}.',x=0.53)
+    plt.title(f'Number of factories: {n_factories}. Number of vehicles: {n_vehicles*n_factories}')
+    plt.tight_layout()
     plt.show()
     
