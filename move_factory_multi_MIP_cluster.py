@@ -140,8 +140,8 @@ if __name__ == "__main__":
         if xmin <= x <= xmax and ymin <= y <= ymax:
             bays_test1.append((x, y))
 
-    n_factories = 3
-    n_vehicles = 3
+    n_factories = 2
+    n_vehicles = 6
     n_locations = len(facts)
     print(n_locations)
     factory_assignments, start_times, end_times, cost = multi_MIP(bays, facts, n_vehicles, n_factories)
@@ -187,7 +187,7 @@ if __name__ == "__main__":
     plt.legend(loc='lower left')
     ttm = max(max(v) for v in end_times.values())
     plt.suptitle(f'Total build time: {ttm} min. Cost: ${cost:.2f}.',x=0.53)
-    plt.title(f'Number of factories: {n_factories}. Number of vehicles: {n_vehicles*n_factories}')
+    plt.title(f'Number of factories: {n_factories}. Number of vehicles: {n_vehicles}')
     plt.tight_layout()
     plt.show()
     

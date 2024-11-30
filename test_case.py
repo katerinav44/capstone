@@ -64,7 +64,7 @@ if __name__ == "__main__":
         
         # Run the simulation with this configuration
         
-        t_finish, factory_start_time, factory_finish_time, cost=run_factories(factory_assignments, 3)
+        t_finish, factory_start_time, factory_finish_time, cost=run_factories(factory_assignments, 1)
         print(factory_finish_time)
         # Reset standard output back to original
         #sys.stdout = original_stdout
