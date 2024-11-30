@@ -265,8 +265,7 @@ def deliver(fact, bay, t, car_cur):
     return t_delivered, car_next
 
 def move(t):
-    T_move = 60 * 24
-    #T_move = 10
+    T_move = 60 * 10 # 10-hour work day
     t_moved = t + T_move
     return t_moved
 

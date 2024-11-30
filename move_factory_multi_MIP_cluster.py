@@ -41,7 +41,7 @@ def multi_MIP(bays, facts, n_vehicles, n_factories, num_clusters=50):
     max_time = pl.LpVariable('max_time', lowBound=0, cat='Continuous')
 
     # === Objective Function ===
-    movement_penalty = 60 * 24
+    movement_penalty = 60 * 10 # 10-hour work day
     problem += max_time  # Objective function to minimize
 
     # Add terms to the objective function, weighted by the number of bays in each cluster
