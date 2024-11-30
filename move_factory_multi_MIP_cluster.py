@@ -180,7 +180,7 @@ if __name__ == "__main__":
 
     # Plot bounding box 
     # plt.plot(*zip(*bbox), color='blue', label='bounding box for test')
-
+    print(facts)
     # Set plot labels and title
     plt.xlabel('x')
     plt.ylabel('y')

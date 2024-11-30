@@ -1,7 +1,7 @@
 from shapely.geometry import Point, Polygon
 import matplotlib.pyplot as plt
 import json
-from run_factories_no_move import *
+from run_factories import *
 
 # Define Regions
 green_rectangles = [
@@ -48,16 +48,23 @@ if __name__ == "__main__":
     # Open a file to write output
     with open("test_case_time.txt", "w") as file:
         # Redirect standard output to the file
-        original_stdout = sys.stdout  # Save the original standard output
-        sys.stdout = file  # Change standard output to the file
-
+        #original_stdout = sys.stdout  # Save the original standard output
+        #sys.stdout = file  # Change standard output to the file
+        facts=[]
+        for i in range(len(data['factory_locations'])):
+            facts.append((data['factory_locations'][i]['x'], data['factory_locations'][i]['y']))
         # Define the factory assignments as before
-        factory_assignments = {0: {(305, 817): blue_coords},
-                            1: {(342, 1424): green_coords},
-                            2: {(967, 855): orange_coords}} 
+        factory_assignments = {0:{fact: [] for fact in facts},1:{fact: [] for fact in facts}, 2: {fact: [] for fact in facts}}
+        factory_assignments[0][(305,817)]=blue_coords
+        factory_assignments[1][(342,1424)]=green_coords
+        factory_assignments[2][967,855]=orange_coords
+        # factory_assignments = {0: {(305, 817): blue_coords},
+        #                     1: {(342, 1424): green_coords},
+        #                     2: {(967, 855): orange_coords}} 
         
         # Run the simulation with this configuration
-        run_factories(factory_assignments, 3)
-
+        
+        t_finish, factory_start_time, factory_finish_time, cost=run_factories(factory_assignments, 3)
+        print(factory_finish_time)
         # Reset standard output back to original
-        sys.stdout = original_stdout
+        #sys.stdout = original_stdout

@@ -39,6 +39,8 @@ def run_factories(factory_assignments, vehicles):
     for j in range(n_factories):
         for l in range(n_locations):
             fact = loc_list[l]
+            #print(f"Planned structure: {planned}")
+            print(f"Accessing planned[{j}][{fact}]")
             if len(planned[j][fact]) > 0:
                 fact_index[j] = l
                 cur_fact[j] = fact
