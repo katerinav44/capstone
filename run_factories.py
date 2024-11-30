@@ -310,13 +310,20 @@ def estimate_cost(time, vehicles, factories):
     N_field = 3
     N_vehicle = 1
     
+        # Flat deployment cost per factory and per vehicle
+    flat_cost_per_factory = 35000
+    flat_cost_per_vehicle = 6000
+
     factory_cost = hours * factories * d_factory
     vehicle_cost = hours * vehicles * d_vehicle
     factory_labor = factories * (N_factory + N_field)
     vehicle_labor = vehicles * N_vehicle
     labor_cost = hours * c_labor * (factory_labor + vehicle_labor)
 
-    total_cost = factory_cost + vehicle_cost + labor_cost
+    flat_cost = factories * flat_cost_per_factory + vehicles * flat_cost_per_vehicle
+
+    total_cost = factory_cost + vehicle_cost + labor_cost + flat_cost 
+    #print(total_cost)
     return total_cost
 
 if __name__ == "__main__":
