@@ -3,8 +3,8 @@ import numpy as np
 from move_factory_multi_MIP_cluster import multi_MIP, estimate_cost  # Import required functions
 from run_factories import run_factories  # Import the run_factories function
 import json
-import matplotlib.colors as mcolors
-import random
+from matplotlib.ticker import FormatStrFormatter
+
 
 def format_time(ttm):
     """
@@ -12,12 +12,11 @@ def format_time(ttm):
     """
     return ttm / 1440  # Convert to days (1440 minutes in a day)
 
-def generate_factory_vehicle_plot(factory_data, factories):
+
+def generate_factory_vehicle_plot(factory_data, factories, optimal_solution):
     """
-    Create a separate plot for a specific number of factories,
-    showing cost on the right y-axis, time (in days) on the left y-axis,
-    and number of vehicles on the x-axis.
-    Add data labels for the number of vehicles on both time and cost lines.
+    Create a plot for a specific number of factories, showing cost and time.
+    Display the optimal solution in the plot title.
     """
     vehicles = [data[0] for data in factory_data]  # Number of vehicles
     costs = [data[1] for data in factory_data]  # Costs
@@ -41,47 +40,80 @@ def generate_factory_vehicle_plot(factory_data, factories):
     ax2.plot(vehicles, costs, marker='o', linestyle='--', color='tab:green', label='Cost (USD)')
     ax2.tick_params(axis='y', labelcolor='tab:green')
 
+    ax2.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))  # No decimal points for cost
+    ax1.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))  # Two decimal points for time
+
     # Add data labels for the cost line
     for i, (x, y) in enumerate(zip(vehicles, costs)):
         ax2.text(x, y, f"{vehicles[i]} veh", fontsize=9, color='tab:green', ha='left', va='bottom')
 
-    # Title and legend
-    fig.suptitle(f'Factory Count: {factories}', fontsize=14)
+    # Add optimal solution details to the title
+    if optimal_solution:
+        optimal_vehicle, optimal_cost, optimal_time = optimal_solution
+        title = (
+            f"Factory Count: {factories}\n"
+            f"Optimal Solution: {factories} factories, {optimal_vehicle} vehicles, "
+            f"Cost: ${optimal_cost:,.2f}, Time: {optimal_time:.2f} days"
+        )
+    else:
+        title = f"Factory Count: {factories}"
+
+    # Set title
+    fig.suptitle(title, fontsize=14)
     fig.tight_layout()
     plt.show()
 
+
+
 def generate_plots(bays, facts):
     """
-    Generate the main plot and individual factory-vehicle plots.
+    Generate plots for all factory and vehicle scenarios and include the optimal solution in the titles.
     """
     factories_range = range(1, 4)  # 1 to 3 factories
-    vehicles_range = range(1, 5)  # 1 to 4 vehicles
+    vehicles_range = range(1, 10)  # 1 to 9 vehicles
     results = []
 
     # Collect data for individual factory plots
     factory_data = {factories: [] for factories in factories_range}
+    optimal_solutions = {}
 
     for factories in factories_range:
+        min_cost = float('inf')  # Initialize minimum cost
+        optimal_vehicle = None
+        optimal_time = None
+
         for vehicles in vehicles_range:
             # Run the multi_MIP function to get factory assignments
             factory_assignments, _, _, _ = multi_MIP(
                 bays, facts, n_vehicles=vehicles, n_factories=factories, num_clusters=50
             )
-            
+
             # Calculate ttm using the run_factories function
             ttm, _, _, _ = run_factories(factory_assignments, vehicles)
 
             # Estimate cost based on ttm
-            cost = estimate_cost(vehicles, factories, ttm / 60)  # Convert ttm to hours
+            cost = estimate_cost(ttm, vehicles, factories)
             time_in_days = format_time(ttm)
             results.append((factories, vehicles, cost, time_in_days))
 
             # Store data for factory-specific plots
             factory_data[factories].append((vehicles, cost, time_in_days))
 
+            # Check for the optimal solution based on the lowest cost
+            if cost < min_cost:
+                min_cost = cost
+                optimal_vehicle = vehicles
+                optimal_time = time_in_days
+
+        # Store the optimal solution for annotation
+        optimal_solutions[factories] = (optimal_vehicle, min_cost, optimal_time)
+
     # Generate individual factory plots
     for factories, data in factory_data.items():
-        generate_factory_vehicle_plot(data, factories)
+        generate_factory_vehicle_plot(data, factories, optimal_solutions.get(factories))
+
+
+
 if __name__ == "__main__":
     with open('test_data_20k.json', 'r') as file:
         data = json.load(file)
@@ -103,8 +135,4 @@ if __name__ == "__main__":
         if xmin <= x <= xmax and ymin <= y <= ymax:
             bays_test1.append((x, y))
 
-    n_factories = 2
-    n_vehicles = 3
-    n_locations = len(facts)
-    print(n_locations)
     generate_plots(bays, facts)
