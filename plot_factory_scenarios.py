@@ -3,8 +3,8 @@ import numpy as np
 from move_factory_multi_MIP_cluster import multi_MIP, estimate_cost  # Import required functions
 from run_factories import run_factories  # Import the run_factories function
 import json
-import matplotlib.colors as mcolors
-import random
+from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
+
 
 def format_time(ttm):
     """
@@ -20,7 +20,7 @@ def generate_plot(bays, facts):
     Generate a plot of cost vs. time to complete using multi_MIP and run_factories.
     """
     factories_range = range(1, 4)  # 1 to 3 factories
-    vehicles_range = range(1, 5)  # 1 to 4 vehicles
+    vehicles_range = range(1, 10)  # 1 to 9 vehicles
     results = []
 
     # Define base colors for factories
@@ -37,18 +37,21 @@ def generate_plot(bays, facts):
             ttm, _, _, _ = run_factories(factory_assignments, vehicles)
 
             # Estimate cost based on ttm
-            cost = estimate_cost(vehicles, factories, ttm / 60)  # Convert ttm to hours
+            cost = estimate_cost(ttm, vehicles, factories)  
             results.append((factories, vehicles, cost, format_time(ttm)))
-
+            print(results)
     # Extract data for plotting
     x_data = [r[2] for r in results]  # Cost
     y_data = [r[3] for r in results]  # Time in days
+    
+
     labels = [(r[0], r[1]) for r in results]  # Factories and vehicles
 
     # Plot the results
     plt.figure(figsize=(12, 8))
+    ax = plt.gca()  # Get the current axis
 
-    x_offset = 0.02 * (max(x_data) - min(x_data))  # Adjust offset relative to x-axis range
+    x_offset = 0.01 * (max(x_data) - min(x_data))  # Adjust offset relative to x-axis range
 
     for factories in factories_range:
         # Assign a single color to each factory configuration
@@ -56,7 +59,7 @@ def generate_plot(bays, facts):
 
         for vehicles in vehicles_range:
             idx = (factories - 1) * len(vehicles_range) + (vehicles - 1)
-            label_text = f"({factories} fact., {vehicles} veh.)"
+            label_text = f"{vehicles}"
 
             # Only add legend entry for the first vehicle of each factory configuration
             plt.scatter(
@@ -90,6 +93,11 @@ def generate_plot(bays, facts):
     plt.ylabel('Time to Complete (days)')
     plt.grid(True)
 
+        # Disable scientific notation on both axes
+    ax.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))  # No decimal points for cost
+    ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))  # Two decimal points for time
+
+
     # Avoid duplicate legends
     handles, labels = plt.gca().get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
@@ -97,11 +105,12 @@ def generate_plot(bays, facts):
 
     plt.show()
 
-    # Print summary of times for each scenario
-    print("\nSummary of Times for Each Scenario:")
+    # Print summary of times and costs for each scenario
+    print("\nSummary of Times and Costs for Each Scenario:")
     for result in results:
-        factories, vehicles, _, ttm_in_days = result
-        print(f"{factories} factories, {vehicles} vehicles: {ttm_in_days:.2f} days")
+        factories, vehicles, cost, ttm_in_days = result
+        print(f"{factories} factories, {vehicles} vehicles: {ttm_in_days:.2f} days, Cost: ${cost:,.2f}")
+
 
 if __name__ == "__main__":
     with open('test_data_20k.json', 'r') as file:
