@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from move_factory_multi_MIP_cluster import multi_MIP, estimate_cost  # Import required functions
-from run_factories import run_factories  # Import the run_factories function
+from mip_strategy_generator import multi_MIP   # Import required functions
+from run_factories import run_factories, estimate_cost  # Import the run_factories function
 import json
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 
