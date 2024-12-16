@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.colors as mcolors
 import numpy as np
-from move_factory_multi_MIP_cluster import *
+from mip_strategy_generator import *
 from run_factories import *
 from run_factory import *
 
